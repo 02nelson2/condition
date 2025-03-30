@@ -9,45 +9,45 @@ import { getServerSession } from 'next-auth'
 
 export async function POST(req: Request) {
   try {
-    let { text, chatId }: { text: string; chatId: string } = await req.json()
-    let session = await getServerSession(authOptions)
+    const { text, chatId }: { text: string; chatId: string } = await req.json()
+    const session = await getServerSession(authOptions)
 
     if (!session) return new Response('Unauthorized', { status: 401 })
 
-    let [userId1, userId2] = chatId.split('--')
+    const [userId1, userId2] = chatId.split('--')
 
     if (session.user.id !== userId1 && session.user.id !== userId2) {
       return new Response('Unauthorized', { status: 401 })
     }
 
-    let friendId = session.user.id === userId1 ? userId2 : userId1
+    const friendId = session.user.id === userId1 ? userId2 : userId1
 
-    let friendList = (await fetchRedis(
+    const friendList = (await fetchRedis(
       'smembers',
       `user:${session.user.id}:friends`
     )) as string[]
-    let isFriend = friendList.includes(friendId)
+    const isFriend = friendList.includes(friendId)
 
     if (!isFriend) {
       return new Response('Unauthorized', { status: 401 })
     }
 
-    let rawSender = (await fetchRedis(
+    const rawSender = (await fetchRedis(
       'get',
       `user:${session.user.id}`
     )) as string
-    let sender = JSON.parse(rawSender) as User
+    const sender = JSON.parse(rawSender) as User
 
-    let timestamp = Date.now()
+    const timestamp = Date.now()
 
-    let messageData: Message = {
+    const messageData: Message = {
       id: nanoid(),
       senderId: session.user.id,
       text,
       timestamp,
     }
 
-    let message = messageValidator.parse(messageData)
+    const message = messageValidator.parse(messageData)
 
     // notify all connected chat room clients
     await pusherServer.trigger(toPusherKey(`chat:${chatId}`), 'incoming-message', message)
