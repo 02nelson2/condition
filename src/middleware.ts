@@ -4,14 +4,14 @@ import { NextResponse } from 'next/server'
 
 export default withAuth(
   async function middleware(req) {
-    let pathname = req.nextUrl.pathname
+    const pathname = req.nextUrl.pathname
 
     // Manage route protection
-    let isAuth = await getToken({ req })
-    let isLoginPage = pathname.startsWith('/login')
+    const isAuth = await getToken({ req })
+    const isLoginPage = pathname.startsWith('/login')
 
-    let sensitiveRoutes = ['/dashboard']
-    let isAccessingSensitiveRoute = sensitiveRoutes.some((route) =>
+    const sensitiveRoutes = ['/dashboard']
+    const isAccessingSensitiveRoute = sensitiveRoutes.some((route) =>
       pathname.startsWith(route)
     )
 
@@ -40,6 +40,6 @@ export default withAuth(
   }
 )
 
-export let config = {
+export const config = {
   matchter: ['/', '/login', '/dashboard/:path*'],
 }
