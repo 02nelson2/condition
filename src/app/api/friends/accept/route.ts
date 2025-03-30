@@ -8,18 +8,18 @@ import { z } from 'zod'
 
 export async function POST(req: Request) {
   try {
-    let body = await req.json()
+    const body = await req.json()
 
-    let { id: idToAdd } = z.object({ id: z.string() }).parse(body)
+    const { id: idToAdd } = z.object({ id: z.string() }).parse(body)
 
-    let session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions)
 
     if (!session) {
       return new Response('Unauthorized', { status: 401 })
     }
 
     // verify both users are not already friends
-    let isAlreadyFriends = await fetchRedis(
+    const isAlreadyFriends = await fetchRedis(
       'sismember',
       `user:${session.user.id}:friends`,
       idToAdd
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       return new Response('Already friends', { status: 400 })
     }
 
-    let hasFriendRequest = await fetchRedis(
+    const hasFriendRequest = await fetchRedis(
       'sismember',
       `user:${session.user.id}:incoming_friend_requests`,
       idToAdd
@@ -39,13 +39,13 @@ export async function POST(req: Request) {
       return new Response('No friend request', { status: 400 })
     }
 
-    let [userRaw, friendRaw] = (await Promise.all([
+    const [userRaw, friendRaw] = (await Promise.all([
       fetchRedis('get', `user:${session.user.id}`),
       fetchRedis('get', `user:${idToAdd}`),
     ])) as [string, string]
 
-    let user = JSON.parse(userRaw) as User
-    let friend = JSON.parse(friendRaw) as User
+    const user = JSON.parse(userRaw) as User
+    const friend = JSON.parse(friendRaw) as User
 
     // notify added user
 
