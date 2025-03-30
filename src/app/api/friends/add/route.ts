@@ -9,11 +9,11 @@ import { z } from 'zod'
 
 export async function POST(req: Request) {
   try {
-    let body = await req.json()
+    const body = await req.json()
 
-    let { email: emailToAdd } = addFriendValidator.parse(body.email)
+    const { email: emailToAdd } = addFriendValidator.parse(body.email)
 
-    let idToAdd = (await fetchRedis(
+    const idToAdd = (await fetchRedis(
       'get',
       `user:email:${emailToAdd}`
     )) as string
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       return new Response('This person does not exist.', { status: 400 })
     }
 
-    let session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions)
 
     if (!session) {
       return new Response('Unauthorized', { status: 401 })
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     }
 
     // check if user is already added
-    let isAlreadyAdded = (await fetchRedis(
+    const isAlreadyAdded = (await fetchRedis(
       'sismember',
       `user:${idToAdd}:incoming_friend_requests`,
       session.user.id
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     }
 
     // check if user is already added
-    let isAlreadyFriends = (await fetchRedis(
+    const isAlreadyFriends = (await fetchRedis(
       'sismember',
       `user:${session.user.id}:friends`,
       idToAdd
