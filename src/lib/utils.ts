@@ -10,6 +10,6 @@ export function toPusherKey(key: string) {
 }
 
 export function chatHrefConstructor(id1: string, id2: string) {
-  let sortedIds = [id1, id2].sort()
+  const sortedIds = [id1, id2].sort()
   return `${sortedIds[0]}--${sortedIds[1]}`
 }
